@@ -12,12 +12,16 @@ pub trait ControllerIndex {
     fn controller_id(&self) -> usize;
     /// Returns a reference to the controller with the given index.
     fn index<'a>(&self, group: &'a ControllerGroup) -> OpenRgbResult<&'a Controller> {
-        group.controllers.get(self.controller_id()).ok_or_else(|| {
-            OpenRgbError::CommandError(format!(
-                "Controller with index {} not found",
-                self.controller_id()
-            ))
-        })
+        group
+            .controllers
+            .iter()
+            .find(|controller| controller.id() == self.controller_id())
+            .ok_or_else(|| {
+                OpenRgbError::CommandError(format!(
+                    "Controller with index {} not found",
+                    self.controller_id()
+                ))
+            })
     }
     /// Removes the controller with the given index from the group and returns it.
     fn remove(&self, group: &mut ControllerGroup) -> OpenRgbResult<Controller> {
